@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración - BotEstetica IA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        #contenido { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div id="login" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-4">Acceso restringido</h2>
+            <input id="password" type="password" placeholder="Ingresa la contraseña"
+                   class="border rounded px-4 py-2 mb-4 w-full">
+            <button onclick="verificarPassword()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">
+                Entrar
+            </button>
+            <p id="error" class="text-red-500 text-sm mt-2 hidden">Contraseña incorrecta</p>
+        </div>
+    </div>
+
+    <div id="contenido">
+        <header class="bg-blue-600 text-white text-center py-6 shadow-md">
+            <h1 class="text-3xl font-bold">Panel de Administración</h1>
+            <p class="text-sm mt-1">Citas registradas - BotEstetica IA</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 py-10">
+            <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead class="bg-blue-100 text-blue-800 text-left">
+                    <tr>
+                        <th class="py-3 px-4">Nombre</th>
+                        <th class="py-3 px-4">Fecha</th>
+                        <th class="py-3 px-4">Hora</th>
+                        <th class="py-3 px-4">Tratamiento</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-citas" class="text-sm">
+                    <tr><td colspan="4" class="py-4 px-4 text-center text-gray-500">Cargando citas...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        function verificarPassword() {
+            const pass = document.getElementById("password").value;
+            if (pass === "admin2025") {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("contenido").style.display = "block";
+                cargarCitas();
+            } else {
+                document.getElementById("error").classList.remove("hidden");
+            }
+        }
+
+        async function cargarCitas() {
+            const res = await fetch('https://botestetica-backend.onrender.com/ver-citas');
+            const citas = await res.json();
+            const tabla = document.getElementById('tabla-citas');
+            tabla.innerHTML = "";
+
+            if (citas.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="4" class="py-4 px-4 text-center text-gray-500">No hay citas registradas.</td></tr>';
+                return;
+            }
+
+            citas.forEach(cita => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-b">${cita.nombre}</td>
+                    <td class="py-2 px-4 border-b">${cita.fecha}</td>
+                    <td class="py-2 px-4 border-b">${cita.hora}</td>
+                    <td class="py-2 px-4 border-b">${cita.tratamiento}</td>
+                `;
+                tabla.appendChild(row);
+            });
+        }
+    </script>
+
+</body>
+</html>
